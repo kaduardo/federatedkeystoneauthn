@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//src/br/rnp/stcfed/sts/client/impl/IDPMaisClient.java=UTF-8
+encoding//src/connection/MyHttpClientTrustAll.java=UTF-8
+encoding//src/federacao/AuthFederatedKeystone.java=UTF-8
+encoding//src/keystone/FederatedKeystone.java=UTF-8
