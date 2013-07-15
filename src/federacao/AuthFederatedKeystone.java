@@ -101,7 +101,7 @@ public class AuthFederatedKeystone extends FederatedKeystone{
 		
 		try {			
             
-            //cria json sem conte���do e o insere no corpo (body) da requisi������o
+            //cria json sem conteudo e o insere no corpo (body) da requisi������o
             StringEntity entity = new StringEntity("{}");
             
           
@@ -319,6 +319,12 @@ public class AuthFederatedKeystone extends FederatedKeystone{
 			httppost.abort();
 	    }
 		
+	}
+
+	@Override
+	public String getIdPResponse(String idpEndpoint, String idpRequest) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

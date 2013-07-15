@@ -75,7 +75,9 @@ public abstract class FederatedKeystone {
 		return null;
 	}
 	
-	public abstract void getScopedToken(String keystoneEndpoint, String idpResponse, String tenantFn);
+	public void getScopedToken(String keystoneEndpoint, String idpResponse, String tenantFn){
+		
+	}
 	
 	public String swapTokens(String keystoneEndpoint, String unscopedToken,
 			String tenantId) throws Exception {

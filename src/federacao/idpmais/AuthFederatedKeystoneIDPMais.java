@@ -121,6 +121,13 @@ public class AuthFederatedKeystoneIDPMais extends FederatedKeystone {
 	    }
 		
 	}
+
+
+	@Override
+	public String getIdPResponse(String idpEndpoint, String idpRequest) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 
