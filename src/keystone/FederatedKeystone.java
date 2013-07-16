@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -20,9 +22,25 @@ import connection.OurUtil;
 
 public abstract class FederatedKeystone {
 
-	protected DefaultHttpClient httpClient;
-
+	private DefaultHttpClient httpClient;
+	
+	private String keystoneEndpoint;
+	private String realm;
+	
+	private String username;
+	private String password;
+	
+	private String samlRequest;
+	private String samlResponse;
+	
+	private String unescopedToken;
+	private String token;
+	
 	public FederatedKeystone() {
+		this(null);
+	}
+	
+	public FederatedKeystone(String keystoneEndpoint) {
 		this.httpClient = new MyHttpClientTrustAll();
 	}
 
@@ -33,7 +51,6 @@ public abstract class FederatedKeystone {
             
             //cria json sem conteudo e o insere no corpo (body) da requisicao
             StringEntity entity = new StringEntity("{}");
-            
           
             entity.setContentType("application/json");
             httpPostRequest.setEntity(entity);
@@ -72,7 +89,9 @@ public abstract class FederatedKeystone {
 		String[] responses = new String[2];
 		HttpPost httpPost = new HttpPost(keystoneEndpoint);
 		
-		try {			
+		this.setRealm(realm);
+		
+		try {
             
             //cria json com crenciais para requisitar autenticação
             StringEntity entity = new StringEntity("{\"realm\": {\"name\":\""+realm+"\"}}");
@@ -91,8 +110,10 @@ public abstract class FederatedKeystone {
             
             JSONObject jsonResp = new JSONObject(responseAsString);
             
-            responses[0]=jsonResp.getString("idpEndpoint"); 
-            responses[1]=jsonResp.getString("idpRequest");
+            responses[0] = jsonResp.getString("idpEndpoint"); 
+            responses[1] = jsonResp.getString("idpRequest");
+            
+            this.setSamlRequest(responses[1]);
             
             return responses;
 		} finally {
@@ -101,14 +122,54 @@ public abstract class FederatedKeystone {
 		
 	}
 	
-	public abstract String getIdPResponse(String idpEndpoint, String idpRequest) ;
+	public abstract String getIdPResponse(String idpEndpoint, String idpRequest) throws Exception;
 	
-	public List<String> getUnscopedToken(String keystone, String idpResponse, String realm) {
-		return null;
+	public JSONArray getUnscopedToken(String keystoneEndpoint, String idpResponse, String realm) throws Exception {
+		System.out.println("sendSAMlrespToKeystone endpoint: "+ keystoneEndpoint );
+		System.out.println("sendSAMlrespToKeystone idpResponse: "+ idpResponse );
+
+		HttpPost httppost = new HttpPost(keystoneEndpoint);
+		
+		try {
+            //Debug
+			String samlDecoded = new String(Base64.decodeBase64(idpResponse.getBytes("UTF-8")));
+			System.out.println("\n\n<INI>>>Saml decoded: \n\n"+samlDecoded+ "\n <FIM DECODED>>>>>>");
+			// End Debug
+
+            StringEntity entity = new StringEntity(
+            		"{\"realm\":{\"name\":\""+realm+"\"}," +
+            				"\"idpResponse\":\"SAMLResponse=" + URLEncoder.encode(idpResponse, "UTF-8") +"\"}");
+
+            System.out.println("JSON TO SEND:   <<<<<INI>>>>>\n" +  httpEntityToString(entity)+ "\n<<<<<FIM>>>>>");
+            entity.setContentType("application/json");
+            httppost.setEntity(entity);
+            httppost.addHeader("Content-type","application/json");
+            httppost.addHeader("X-Authentication-Type","federated");
+			
+			//vai tratar a resposta da requisicao 
+            HttpResponse requestResp = httpClient.execute(httppost);
+            System.out.println("Http post sendSAMlrespToKeystone executed ");
+            
+            //transforma resposta em uma string contendo o json da resposta
+            String responseAsString = httpEntityToString(requestResp.getEntity());
+            System.out.println("\n\ngetUnscopedToken Keystone response:\n" + responseAsString);
+            
+            JSONObject jsonResp = new JSONObject(responseAsString);
+            
+            //Recover the unescoped token
+            this.setUnescopedToken(jsonResp.getString("unscopedToken"));
+            
+            //Recover the list of tenants
+            JSONArray result = jsonResp.getJSONArray("tenants");
+            return result;
+		} finally {
+			httppost.abort();
+	    }
+
 	}
 	
 	public void getScopedToken(String keystoneEndpoint, String idpResponse, String tenantFn){
-		
+
 	}
 	
 	public String swapTokens(String keystoneEndpoint, String unscopedToken,
@@ -171,5 +232,78 @@ public abstract class FederatedKeystone {
 			return null;
 	    }
 	}
+
+	public DefaultHttpClient getHttpClient() {
+		return httpClient;
+	}
+
+	public void setHttpClient(DefaultHttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
+
+	public String getKeystoneEndpoint() {
+		return keystoneEndpoint;
+	}
+
+	public void setKeystoneEndpoint(String keystoneEndpoint) {
+		this.keystoneEndpoint = keystoneEndpoint;
+	}
+
+	public String getRealm() {
+		return realm;
+	}
+
+	public void setRealm(String realm) {
+		this.realm = realm;
+	}
+
+	public String getSamlRequest() {
+		return samlRequest;
+	}
+
+	public void setSamlRequest(String samlRequest) {
+		this.samlRequest = samlRequest;
+	}
+
+	public String getSamlResponse() {
+		return samlResponse;
+	}
+
+	public void setSamlResponse(String samlResponse) {
+		this.samlResponse = samlResponse;
+	}
+
+	public String getUnescopedToken() {
+		return unescopedToken;
+	}
+
+	public void setUnescopedToken(String unescopedToken) {
+		this.unescopedToken = unescopedToken;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
 	
 }

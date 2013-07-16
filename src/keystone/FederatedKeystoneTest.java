@@ -10,7 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
 
-public abstract class FederatedKeystoneTestCase {
+public abstract class FederatedKeystoneTest {
 
 	protected FederatedKeystone keystoneClient;
 	
@@ -49,7 +49,18 @@ public abstract class FederatedKeystoneTestCase {
 	}
 
 	@Test
-	public abstract void testGetIdPResponse() throws Exception ;
+	public void testGetIdPResponse() throws Exception {
+		
+		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		
+		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
+		
+		assertNotNull(response);
+		
+		System.out.println("IdP+ response: \n" + response);
+		
+		fail("Not yet implemented"); // TODO
+	}
 	
 	@Test
 	public void testGetUnscopedToken() throws Exception {
