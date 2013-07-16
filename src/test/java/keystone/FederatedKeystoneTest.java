@@ -54,6 +54,10 @@ public abstract class FederatedKeystoneTest {
 		
 		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
 		
+		if (IDP_ENDPOINT == null) {
+			IDP_ENDPOINT = idpRequest[0];
+		}
+		
 		System.out.println("Authenticating on IDP " + IDP_ENDPOINT);
 		System.out.println("With " + idpRequest[1]);
 		
@@ -61,7 +65,7 @@ public abstract class FederatedKeystoneTest {
 		
 		assertNotNull(response);
 		
-		System.out.println("IdP+ response: \n" + response);
+		System.out.println("IdP response: \n" + response);
 		
 		fail("Not yet implemented"); // TODO
 	}
@@ -69,6 +73,9 @@ public abstract class FederatedKeystoneTest {
 	@Test
 	public void testGetUnscopedToken() throws Exception {
 		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		if (IDP_ENDPOINT == null) {
+			IDP_ENDPOINT = idpRequest[0];
+		}
 		
 		String idpResponse = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
@@ -94,6 +101,9 @@ public abstract class FederatedKeystoneTest {
 	@Test
 	public void testSwapTokens() throws Exception {
 		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		if (IDP_ENDPOINT == null) {
+			IDP_ENDPOINT = idpRequest[0];
+		}
 		
 		String idpResponse = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
