@@ -23,168 +23,176 @@ import connection.OurUtil;
 public abstract class FederatedKeystone {
 
 	private DefaultHttpClient httpClient;
-	
+
 	private String keystoneEndpoint;
 	private String realm;
-	
+
 	private String username;
 	private String password;
-	
+
 	private String samlRequest;
 	private String samlResponse;
-	
+
 	private String unescopedToken;
 	private String token;
-	
+
 	public FederatedKeystone() {
 		this(null);
 	}
-	
+
 	public FederatedKeystone(String keystoneEndpoint) {
 		this.httpClient = new MyHttpClientTrustAll();
 	}
 
-	public List<String> getRealmList(String keystoneEndpoint) throws Exception{
-		
+	public List<String> getRealmList(String keystoneEndpoint) throws Exception {
+
 		HttpPost httpPostRequest = new HttpPost(keystoneEndpoint);
-		try {			
-            
-            //cria json sem conteudo e o insere no corpo (body) da requisicao
-            StringEntity entity = new StringEntity("{}");
-          
-            entity.setContentType("application/json");
-            httpPostRequest.setEntity(entity);
-            httpPostRequest.addHeader("Content-type","application/json");
-            httpPostRequest.addHeader("X-Authentication-Type","federated");
-            
-            System.out.println("request: " + httpPostRequest.toString());
-            
-            //vai tratar a resposta da requisio
-            HttpResponse resp = httpClient.execute(httpPostRequest);
-            
-            //transforma resposta em uma string contendo o json da resposta
-            String response = OurUtil.httpEntityToString(resp.getEntity());
-            
-            JSONObject jsonResp = new JSONObject(response);
-            
-            //OBS.: realm=IDP
-            JSONArray realms = jsonResp.getJSONArray("realms");
-            
-            ArrayList<String> idps = new ArrayList<String>();
-            
-            for (int i = 0; i < realms.length(); ++i) {
+		try {
+
+			// cria json sem conteudo e o insere no corpo (body) da requisicao
+			StringEntity entity = new StringEntity("{}");
+
+			entity.setContentType("application/json");
+			httpPostRequest.setEntity(entity);
+			httpPostRequest.addHeader("Content-type", "application/json");
+			httpPostRequest.addHeader("X-Authentication-Type", "federated");
+
+			System.out.println("request: " + httpPostRequest.toString());
+
+			// vai tratar a resposta da requisio
+			HttpResponse resp = httpClient.execute(httpPostRequest);
+
+			// transforma resposta em uma string contendo o json da resposta
+			String response = OurUtil.httpEntityToString(resp.getEntity());
+
+			JSONObject jsonResp = new JSONObject(response);
+
+			// OBS.: realm=IDP
+			JSONArray realms = jsonResp.getJSONArray("realms");
+
+			ArrayList<String> idps = new ArrayList<String>();
+
+			for (int i = 0; i < realms.length(); ++i) {
 				JSONObject realm = realms.getJSONObject(i);
-				
+
 				idps.add(realm.getString("name"));
 				System.out.println("realm: " + realm.getString("name"));
 			}
-            
-            return idps;
+
+			return idps;
 		} finally {
 			httpPostRequest.abort();
-	    }
+		}
 	}
-	
-	public String[] getIdPRequest(String keystoneEndpoint, String realm) throws Exception {
+
+	public String[] getIdPRequest(String keystoneEndpoint, String realm)
+			throws Exception {
 		String[] responses = new String[2];
 		HttpPost httpPost = new HttpPost(keystoneEndpoint);
-		
+
 		this.setRealm(realm);
-		
+
 		try {
-            
-            //cria json com crenciais para requisitar autenticação
-            StringEntity entity = new StringEntity("{\"realm\": {\"name\":\""+realm+"\"}}");
-          
-            entity.setContentType("application/json");
-            httpPost.setEntity(entity);
-            httpPost.addHeader("Content-type","application/json");
-            httpPost.addHeader("X-Authentication-Type","federated");
-            System.out.println("request: " + httpPost.toString());
-            
-            //vai tratar a resposta da requisição
-            HttpResponse resp= httpClient.execute(httpPost);
-            
-            //transforma resposta em uma string contendo o json da resposta
-            String responseAsString = httpEntityToString(resp.getEntity());
-            
-            JSONObject jsonResp = new JSONObject(responseAsString);
-            
-            responses[0] = jsonResp.getString("idpEndpoint"); 
-            responses[1] = jsonResp.getString("idpRequest");
-            
-            this.setSamlRequest(responses[1]);
-            
-            return responses;
+
+			// cria json com crenciais para requisitar autenticação
+			StringEntity entity = new StringEntity("{\"realm\": {\"name\":\""
+					+ realm + "\"}}");
+
+			entity.setContentType("application/json");
+			httpPost.setEntity(entity);
+			httpPost.addHeader("Content-type", "application/json");
+			httpPost.addHeader("X-Authentication-Type", "federated");
+
+			// vai tratar a resposta da requisição
+			HttpResponse resp = httpClient.execute(httpPost);
+
+			// transforma resposta em uma string contendo o json da resposta
+			String responseAsString = httpEntityToString(resp.getEntity());
+
+			JSONObject jsonResp = new JSONObject(responseAsString);
+
+			responses[0] = jsonResp.getString("idpEndpoint");
+			responses[1] = jsonResp.getString("idpRequest");
+
+			this.setSamlRequest(responses[1]);
+
+			return responses;
 		} finally {
 			httpPost.abort();
-	    }
-		
+		}
+
 	}
-	
-	public abstract String getIdPResponse(String idpEndpoint, String idpRequest) throws Exception;
-	
-	public JSONArray getUnscopedToken(String keystoneEndpoint, String idpResponse, String realm) throws Exception {
-		System.out.println("sendSAMlrespToKeystone endpoint: "+ keystoneEndpoint );
-		System.out.println("sendSAMlrespToKeystone idpResponse: "+ idpResponse );
+
+	public abstract String getIdPResponse(String idpEndpoint, String idpRequest)
+			throws Exception;
+
+	public JSONArray getUnscopedToken(String keystoneEndpoint,
+			String idpResponse, String realm) throws Exception {
+		System.out.println("sendSAMlrespToKeystone endpoint: "
+				+ keystoneEndpoint);
+		System.out
+				.println("sendSAMlrespToKeystone idpResponse: " + idpResponse);
 
 		HttpPost httppost = new HttpPost(keystoneEndpoint);
-		
+
 		try {
-            //Debug
-			String samlDecoded = new String(Base64.decodeBase64(idpResponse.getBytes("UTF-8")));
-			System.out.println("\n\n<INI>>>Saml decoded: \n\n"+samlDecoded+ "\n <FIM DECODED>>>>>>");
+			// Debug
+			String samlDecoded = new String(Base64.decodeBase64(idpResponse
+					.getBytes("UTF-8")));
+			System.out.println("\n\n<INI>>>Saml decoded: \n\n" + samlDecoded
+					+ "\n <FIM DECODED>>>>>>");
 			// End Debug
 
-            StringEntity entity = new StringEntity(
-            		"{\"realm\":{\"name\":\""+realm+"\"}," +
-            				"\"idpResponse\":\"SAMLResponse=" + URLEncoder.encode(idpResponse, "UTF-8") +"\"}");
+			StringEntity entity = new StringEntity("{\"realm\":{\"name\":\""
+					+ realm + "\"}," + "\"idpResponse\":\"SAMLResponse="
+					+ URLEncoder.encode(idpResponse, "UTF-8") + "\"}");
 
-            System.out.println("JSON TO SEND:   <<<<<INI>>>>>\n" +  httpEntityToString(entity)+ "\n<<<<<FIM>>>>>");
-            entity.setContentType("application/json");
-            httppost.setEntity(entity);
-            httppost.addHeader("Content-type","application/json");
-            httppost.addHeader("X-Authentication-Type","federated");
-			
-			//vai tratar a resposta da requisicao 
-            HttpResponse requestResp = httpClient.execute(httppost);
-            System.out.println("Http post sendSAMlrespToKeystone executed ");
-            
-            //transforma resposta em uma string contendo o json da resposta
-            String responseAsString = httpEntityToString(requestResp.getEntity());
-            System.out.println("\n\ngetUnscopedToken Keystone response:\n" + responseAsString);
-            
-            JSONObject jsonResp = new JSONObject(responseAsString);
-            
-            //Recover the unescoped token
-            this.setUnescopedToken(jsonResp.getString("unscopedToken"));
-            
-            //Recover the list of tenants
-            JSONArray result = jsonResp.getJSONArray("tenants");
-            return result;
+			System.out.println("JSON TO SEND:   <<<<<INI>>>>>\n"
+					+ httpEntityToString(entity) + "\n<<<<<FIM>>>>>");
+			entity.setContentType("application/json");
+			httppost.setEntity(entity);
+			httppost.addHeader("Content-type", "application/json");
+			httppost.addHeader("X-Authentication-Type", "federated");
+
+			// vai tratar a resposta da requisicao
+			HttpResponse requestResp = httpClient.execute(httppost);
+			System.out.println("Http post sendSAMlrespToKeystone executed ");
+
+			// transforma resposta em uma string contendo o json da resposta
+			String responseAsString = httpEntityToString(requestResp
+					.getEntity());
+			System.out.println("\n\ngetUnscopedToken Keystone response:\n"
+					+ responseAsString);
+
+			JSONObject jsonResp = new JSONObject(responseAsString);
+
+			// Recover the unescoped token
+			this.setUnescopedToken(jsonResp.getString("unscopedToken"));
+
+			// Recover the list of tenants
+			JSONArray result = jsonResp.getJSONArray("tenants");
+			return result;
 		} finally {
 			httppost.abort();
-	    }
+		}
 
 	}
-	
-	public void getScopedToken(String keystoneEndpoint, String idpResponse, String tenantFn){
+
+	public void getScopedToken(String keystoneEndpoint, String idpResponse,
+			String tenantFn) {
 
 	}
-	
+
 	public String swapTokens(String keystoneEndpoint, String unscopedToken,
 			String tenantId) throws Exception {
-		
+
 		String result = null;
 		HttpPost httpPostRequest = new HttpPost(keystoneEndpoint + "/tokens");
-		
+
 		try {
-			StringEntity entity = new StringEntity(
-					"{\"auth\" : " +
-						"{\"token\" : " +
-							"{\"id\" : \"" + unscopedToken + "\"}, " + 
-							" \"tenantId\" : \"" + tenantId + "\"" +
-							"}"
+			StringEntity entity = new StringEntity("{\"auth\" : "
+					+ "{\"token\" : " + "{\"id\" : \"" + unscopedToken
+					+ "\"}, " + " \"tenantId\" : \"" + tenantId + "\"" + "}"
 					+ "}");
 			entity.setContentType("application/json");
 			httpPostRequest.setEntity(entity);
@@ -204,9 +212,10 @@ public abstract class FederatedKeystone {
 			httpPostRequest.abort();
 		}
 	}
-	
+
 	/**
 	 * Converts a HttpEntity to String format
+	 * 
 	 * @param ent
 	 * @return
 	 */
@@ -221,16 +230,16 @@ public abstract class FederatedKeystone {
 				contentBuilder.append(s);
 			}
 			content = contentBuilder.toString();
-//			System.out.println("Entity content" + content);
+			// System.out.println("Entity content" + content);
 			return content;
 		} catch (IOException ex) {
-			System.out.println("Error while checking keystone authentication response");
+			System.out
+					.println("Error while checking keystone authentication response");
 			return null;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-	    }
+		}
 	}
 
 	public DefaultHttpClient getHttpClient() {
@@ -304,6 +313,5 @@ public abstract class FederatedKeystone {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
+
 }

@@ -40,12 +40,13 @@ public abstract class FederatedKeystoneTest {
 		
 		//the endpoint
 		assertNotNull(response[0]);
+		System.out.println("IdP Endpoint: " + response[0]);
 
 		//the request
 		assertNotNull(response[1]);
-		//TODO process the SAMLRequest against the REALM
+		System.out.println("IdP Request: \n" + response[1]);
 		
-		fail("Not yet implemented"); // TODO
+		fail("process the SAMLRequest against the REALM");
 	}
 
 	@Test
