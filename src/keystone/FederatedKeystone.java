@@ -74,9 +74,7 @@ public abstract class FederatedKeystone {
 
 			for (int i = 0; i < realms.length(); ++i) {
 				JSONObject realm = realms.getJSONObject(i);
-
 				idps.add(realm.getString("name"));
-				System.out.println("realm: " + realm.getString("name"));
 			}
 
 			return idps;

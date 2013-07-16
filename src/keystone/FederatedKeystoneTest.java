@@ -54,6 +54,9 @@ public abstract class FederatedKeystoneTest {
 		
 		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
 		
+		System.out.println("Authenticating on IDP " + IDP_ENDPOINT);
+		System.out.println("With " + idpRequest[1]);
+		
 		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
 		assertNotNull(response);

@@ -1,10 +1,8 @@
 package federacao.idpmais;
 
-import static org.junit.Assert.*;
 import keystone.FederatedKeystoneTest;
 
 import org.junit.Before;
-import org.junit.Test;
 
 public class AuthFederatedKeystoneIDPMaisTest extends FederatedKeystoneTest{
 
@@ -28,20 +26,6 @@ public class AuthFederatedKeystoneIDPMaisTest extends FederatedKeystoneTest{
 		
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
-	}
-
-	@Test
-	public void testGetIdPResponse() throws Exception {
-		
-		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
-		
-		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
-		
-		assertNotNull(response);
-		
-		System.out.println("IdP+ response: \n" + response);
-		
-		fail("Not yet implemented"); // TODO
 	}
 
 }
