@@ -39,7 +39,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -63,7 +62,7 @@ public class Connection{
 		// http://stackoverflow.com/questions/2642777/trusting-all-certificates-using-httpclient-over-https
 		// http://stackoverflow.com/questions/2899079/custom-ssl-handling-stopped-working-on-android-2-2-froyo
 		socketFactory = new MySSLSocketFactory(trustStore);
-		Scheme scheme = new Scheme("https", socketFactory, 443);
+		Scheme scheme = new Scheme("https", 443, socketFactory);
 		httpClient.getConnectionManager().getSchemeRegistry().register(scheme);
 	}
 	
@@ -130,7 +129,7 @@ public class Connection{
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 		//Log.w("user_idp endpoint:"," "+idpUrl);
 		nameValuePairs.add(new BasicNameValuePair("user_idp", idpUrl));
-		httpPost1.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
+		httpPost1.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 		HttpResponse response1 = httpClient.execute(httpPost1);
 		String strResponse1 = readResponse(response1.getEntity().getContent()).toString();
 		//-----------------------------------------------
@@ -162,7 +161,7 @@ public class Connection{
 		List<NameValuePair> nameValuePairs2 = new ArrayList<NameValuePair>();
 		nameValuePairs2.add(new BasicNameValuePair("j_username", username));
 		nameValuePairs2.add(new BasicNameValuePair("j_password", password));
-		httpPost2.setEntity(new UrlEncodedFormEntity(nameValuePairs2, HTTP.UTF_8));
+		httpPost2.setEntity(new UrlEncodedFormEntity(nameValuePairs2, "UTF-8"));
 		HttpResponse response2 = httpClient.execute(httpPost2);
 		String strResponse2 = readResponse(response2.getEntity().getContent()).toString();
 		//-----------------------------------------------
@@ -183,7 +182,7 @@ public class Connection{
 		List<NameValuePair> nameValuePairs3 = new ArrayList<NameValuePair>();
 		nameValuePairs3.add(new BasicNameValuePair("RelayState", relayStateValue));
 		nameValuePairs3.add(new BasicNameValuePair("SAMLResponse", SAMLResponseValue));
-		httpPost3.setEntity(new UrlEncodedFormEntity(nameValuePairs3, HTTP.UTF_8));
+		httpPost3.setEntity(new UrlEncodedFormEntity(nameValuePairs3, "UTF-8"));
 		HttpResponse response3 = httpClient.execute(httpPost3);		
 		return readResponse(response3.getEntity().getContent()).toString();
 	}

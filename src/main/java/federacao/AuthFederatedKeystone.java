@@ -78,7 +78,7 @@ public class AuthFederatedKeystone extends FederatedKeystone {
 			List<NameValuePair> nameValuePairs2 = new ArrayList<NameValuePair>();
 			nameValuePairs2.add(new BasicNameValuePair("username", getUsername()));
 			nameValuePairs2.add(new BasicNameValuePair("password", getPassword()));
-			httpPost2.setEntity(new UrlEncodedFormEntity(nameValuePairs2, HTTP.UTF_8));
+			httpPost2.setEntity(new UrlEncodedFormEntity(nameValuePairs2, "UTF-8"));
 			HttpResponse response2 = getHttpClient().execute(httpPost2);
 			String authResponseHtml = OurUtil.httpEntityToString(response2
 					.getEntity());
