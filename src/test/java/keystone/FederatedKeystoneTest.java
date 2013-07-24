@@ -1,8 +1,6 @@
 package keystone;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -17,6 +15,7 @@ public abstract class FederatedKeystoneTest {
 	//Those must be set by the setUp method of subclasses
 	protected String KEYSTONE_ENDPOINT = null;
 	protected String REALM = null;
+	protected String ENTITY_ID = null;
 	protected String IDP_ENDPOINT = null;
 	protected String TENANT_ID = null;
 
@@ -26,10 +25,14 @@ public abstract class FederatedKeystoneTest {
 		
 		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
 		
+		boolean found = false;
 		for (String realm : realms) {
+			if (realm.equals(REALM)) {
+				found = true;
+			}
 			System.out.println("Realm: " + realm);
 		}
-		fail("Not implemented"); //TODO search for REALM in the received realms
+		assertTrue("Expected realm not found.", found);
 	}
 
 	@Test
@@ -46,7 +49,11 @@ public abstract class FederatedKeystoneTest {
 		assertNotNull(response[1]);
 		System.out.println("IdP Request: \n" + response[1]);
 		
-		fail("process the SAMLRequest against the REALM");
+		String entityID = keystoneClient.getEntityID(response[1]);
+		assertNotNull(entityID);
+		System.out.println("EntityID: " + entityID);
+		assertEquals(ENTITY_ID, entityID);
+		
 	}
 
 	@Test

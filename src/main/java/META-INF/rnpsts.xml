@@ -7,14 +7,18 @@
                     <sc1:CallbackHandler classname="br.rnp.stcfed.sts.client.impl.UsernamePasswordCallbackHandler" name="usernameHandler"/>
                     <sc1:CallbackHandler classname="br.rnp.stcfed.sts.client.impl.UsernamePasswordCallbackHandler" name="passwordHandler"/>
                 </sc1:CallbackHandlerConfiguration>
+                <!-- 
                 <sc1:TrustStore wspp:visibility="private" peeralias="xws-security-server" type="JKS" storepass="changeit" location="rnpStsKeystore.jks" />
-                <sc1:KeyStore wspp:visibility="private" peeralias="xws-security-server" type="JKS" storepass="changeit" location="rnpStsKeystore.jks" />
+                -->
+                <sc1:KeyStore wspp:visibility="private" peeralias="xws-security-client" type="JKS" storepass="changeit" location="rnpStsKeystore.jks" />
+                
             </wsp:All>
         </wsp:ExactlyOne>
     </wsp:Policy>
     <wsdl:types>
         <xsd:schema targetNamespace="http://stcfed.rnp.br/Imports">
-            <xsd:import schemaLocation="http://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS?xsd=1" namespace="http://schemas.message.com/Message" />
+          <!-- <xsd:import schemaLocation="https://idp-mais.cafeexpresso.rnp.br/RNPSecurityTokenService/RNPSTS?xsd=1" namespace="http://schemas.message.com/Message" /> -->
+            <xsd:import schemaLocation="https://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS?xsd=1" namespace="http://schemas.message.com/Message" />  
         </xsd:schema>
     </wsdl:types>
     <wsdl:message name="IRNPSTS_IssueToken_InputMessage">

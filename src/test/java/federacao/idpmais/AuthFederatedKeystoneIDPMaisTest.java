@@ -7,9 +7,10 @@ import org.junit.Before;
 public class AuthFederatedKeystoneIDPMaisTest extends FederatedKeystoneTest{
 
 	static String CANA_ENDPOINT = "http://cana.ect.ufrn.br:5000/v2.0";
+	static String CANA_ENTITY_ID = "http://cana.ect.ufrn.br:5000";
 	
 	static String IDPMAIS_REALM = "IdP-stcfed-IFSC";
-	static String IDPMAIS_ENDPOINT = "http://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
+	static String IDPMAIS_ENDPOINT = "https://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
 	static String USERNAME1 = "funcionario";
 	static String PASSWORD1 = "funcionario123";
 	
@@ -23,6 +24,7 @@ public class AuthFederatedKeystoneIDPMaisTest extends FederatedKeystoneTest{
 		this.KEYSTONE_ENDPOINT = CANA_ENDPOINT;
 		this.REALM = IDPMAIS_REALM;
 		this.IDP_ENDPOINT = IDPMAIS_ENDPOINT;
+		this.ENTITY_ID = CANA_ENTITY_ID;
 		
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
