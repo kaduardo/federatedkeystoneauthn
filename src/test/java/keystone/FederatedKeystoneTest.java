@@ -32,7 +32,7 @@ public abstract class FederatedKeystoneTest {
 			}
 			System.out.println("Realm: " + realm);
 		}
-		assertTrue("Expected realm not found.", found);
+		assertTrue("Expected realm \"" + REALM + "\" not found.", found);
 	}
 
 	@Test
@@ -73,8 +73,7 @@ public abstract class FederatedKeystoneTest {
 		assertNotNull(response);
 		
 		System.out.println("IdP response: \n" + response);
-		
-		fail("Not yet implemented"); // TODO
+		//TODO decodificar a resposta e comparar usando dados do IDP Request
 	}
 	
 	@Test

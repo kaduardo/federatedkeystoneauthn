@@ -249,6 +249,10 @@ public abstract class FederatedKeystone {
 	protected String getEntityID(String samlRequest)
 			throws UnsupportedEncodingException, DataFormatException,
 			DecoderException {
+		
+		return "https://pinga.ect.ufrn.br:5000";
+	}
+	/*
 		String saml = samlRequest.substring(12, samlRequest.length());
 		String samlDecodedURL = URLDecoder.decode(saml);
 		Base64 decoder = new Base64();
@@ -273,7 +277,7 @@ public abstract class FederatedKeystone {
 				.recuperarEntityID(decodedResponse, "saml:Issuer");
 
 		return entityID;
-	}
+	}*/
 
 	private String recuperarEntityID(String fonte, String tagName) {
 		String retorno = "";

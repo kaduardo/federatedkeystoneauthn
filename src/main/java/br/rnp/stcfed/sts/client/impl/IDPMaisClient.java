@@ -133,7 +133,9 @@ public class IDPMaisClient {
     	
     	 // Autentica o usu��rio e obt��m asser����o SAML com dados do usu��rio
         Element securityTokenFromSts = getTokenFromSts();
-        System.out.println(XMLHelper.prettyPrintXML(securityTokenFromSts));
+        
+        System.out.println("IDPMaisClient SAMLResponse: \n" + 
+        		XMLHelper.prettyPrintXML(securityTokenFromSts));
         Base64 decoder = new  Base64();
         
        String samlResponse = new String(decoder.encode(XMLHelper.prettyPrintXML(securityTokenFromSts).getBytes()));
