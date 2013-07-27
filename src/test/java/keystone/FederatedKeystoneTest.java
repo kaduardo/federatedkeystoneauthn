@@ -89,6 +89,10 @@ public abstract class FederatedKeystoneTest {
 		
 		System.out.println("Authenticating on IDP " + IDP_ENDPOINT);
 		System.out.println("With " + idpRequest[1]);
+		String entityID = keystoneClient.getEntityID(idpRequest[1]);
+		assertNotNull(entityID);
+		System.out.println("EntityID: " + entityID);
+		
 		
 		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
