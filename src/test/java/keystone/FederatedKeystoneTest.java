@@ -111,7 +111,7 @@ public abstract class FederatedKeystoneTest {
 		
 		String idpResponse = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
-		JSONArray tenants = keystoneClient.getUnscopedToken(KEYSTONE_ENDPOINT, idpResponse, REALM);
+		JSONArray tenants = keystoneClient.getUnscopedToken(KEYSTONE_ENDPOINT, idpResponse, selectedRealm);
 		assertNotNull(tenants);
 		System.out.println("Printing tenants:");
 		for (int i = 0; i < tenants.length(); i++) {
@@ -125,9 +125,7 @@ public abstract class FederatedKeystoneTest {
 		String unscopedToken = keystoneClient.getUnescopedToken();
 		assertNotNull(unscopedToken);
 		System.out.println("Unscoped Token: " + unscopedToken);
-		
-		
-		fail("Not yet implemented"); // TODO
+		//TODO testar se os tenants retornados sao os esperados
 	}
 
 	@Test

@@ -135,10 +135,11 @@ public abstract class FederatedKeystone {
 
 	public JSONArray getUnscopedToken(String keystoneEndpoint,
 			String idpResponse, String realm) throws Exception {
-		System.out.println("sendSAMlrespToKeystone endpoint: "
+		System.out.println("getUnscopedToken - endpoint: "
 				+ keystoneEndpoint);
 		System.out
-				.println("sendSAMlrespToKeystone idpResponse: " + idpResponse);
+				.println("getUnscopedToken - idpResponse: " + idpResponse);
+		System.out.println("getUnscopedToken - realm: " + realm);
 
 		HttpPost httppost = new HttpPost(keystoneEndpoint);
 
@@ -150,11 +151,14 @@ public abstract class FederatedKeystone {
 					+ "\n <FIM DECODED>>>>>>");
 			// End Debug
 
-			StringEntity entity = new StringEntity("{\"realm\":{\"name\":\""
-					+ realm + "\"}," + "\"idpResponse\":\"SAMLResponse="
-					+ URLEncoder.encode(idpResponse, "UTF-8") + "\"}");
+			StringEntity entity = new StringEntity(
+					"{" +
+					"\"realm\" : " + realm + ", " + 
+					" \"idpResponse\" : \"SAMLResponse=" + 
+							URLEncoder.encode(idpResponse, "UTF-8") + "\"" +
+					"}");
 
-			System.out.println("JSON TO SEND:   <<<<<INI>>>>>\n"
+			System.out.println("JSON TO SEND:\n<<<<<INI>>>>>\n"
 					+ httpEntityToString(entity) + "\n<<<<<FIM>>>>>");
 			entity.setContentType("application/json");
 			httppost.setEntity(entity);

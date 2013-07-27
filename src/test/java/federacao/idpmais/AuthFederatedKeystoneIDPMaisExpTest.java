@@ -44,32 +44,5 @@ public class AuthFederatedKeystoneIDPMaisExpTest extends FederatedKeystoneTest{
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
 	}
-	
-	@Test
-	public void testGetUnscopedToken() throws Exception {
-		//String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
-		//if (IDP_ENDPOINT == null) {
-		//	IDP_ENDPOINT = idpRequest[0];
-		//}
-		
-		String idpResponse = keystoneClient.getIdPResponse(IDP_ENDPOINT, null);
-		
-		JSONArray tenants = keystoneClient.getUnscopedToken(KEYSTONE_ENDPOINT, idpResponse, REALM);
-		assertNotNull(tenants);
-		System.out.println("Printing tenants:");
-		for (int i = 0; i < tenants.length(); i++) {
-			JSONObject tenant = tenants.getJSONObject(i);
-			assertNotNull(tenant);
-			System.out.println("FriendlyName: " + tenant.getString("friendlyName") );
-			System.out.println("Name: " + tenant.getString("name") );
-			System.out.println("id: " + tenant.getString("id") );
-		}
-		
-		String unscopedToken = keystoneClient.getUnescopedToken();
-		assertNotNull(unscopedToken);
-		System.out.println("Unscoped Token: " + unscopedToken);
-		
-		
-		fail("Not yet implemented"); // TODO
-	}
+
 }
