@@ -81,7 +81,7 @@ public abstract class FederatedKeystoneTest {
 		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);		
 		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
 		processRealm(realms);
-		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, selectedRealm);
 		
 		if (IDP_ENDPOINT == null) {
 			IDP_ENDPOINT = idpRequest[0];
@@ -89,10 +89,6 @@ public abstract class FederatedKeystoneTest {
 		
 		System.out.println("Authenticating on IDP " + IDP_ENDPOINT);
 		System.out.println("With " + idpRequest[1]);
-		String entityID = keystoneClient.getEntityID(idpRequest[1]);
-		assertNotNull(entityID);
-		System.out.println("EntityID: " + entityID);
-		
 		
 		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
@@ -104,7 +100,11 @@ public abstract class FederatedKeystoneTest {
 	
 	@Test
 	public void testGetUnscopedToken() throws Exception {
-		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);	
+		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
+		processRealm(realms);
+		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, selectedRealm);
+
 		if (IDP_ENDPOINT == null) {
 			IDP_ENDPOINT = idpRequest[0];
 		}

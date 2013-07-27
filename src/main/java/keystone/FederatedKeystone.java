@@ -14,6 +14,7 @@ import java.util.zip.Inflater;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -97,7 +98,7 @@ public abstract class FederatedKeystone {
 
 		try {
 
-			// cria json com crenciais para requisitar autenticação
+			// cria json com crenciais para requisitar autentica����o
 			String json = "{\"realm\":"
 					+ realm + "}";
 			System.out.println("Json to send: \n" + json);
@@ -109,7 +110,7 @@ public abstract class FederatedKeystone {
 			httpPost.addHeader("Content-type", "application/json");
 			httpPost.addHeader("X-Authentication-Type", "federated");
 
-			// vai tratar a resposta da requisição
+			// vai tratar a resposta da requisi����o
 			HttpResponse resp = httpClient.execute(httpPost);
 
 			// transforma resposta em uma string contendo o json da resposta
@@ -251,36 +252,35 @@ public abstract class FederatedKeystone {
 	//TODO improve this method to use SAML objects
 	protected String getEntityID(String samlRequest)
 			throws UnsupportedEncodingException, DataFormatException,
-			DecoderException {
+			DecoderException, IOException {
+	
+		//TODO Confirm where this 13 comes from
+		String saml = samlRequest.substring(13, samlRequest.length());
+		String samlDecodedURL = URLDecoder.decode(saml, "UTF-8");
 		
-		return "https://pinga.ect.ufrn.br:5000";
-	}
-	/*
-		String saml = samlRequest.substring(12, samlRequest.length());
-		String samlDecodedURL = URLDecoder.decode(saml);
 		Base64 decoder = new Base64();
 		byte[] decodeBytes = decoder.decode(samlDecodedURL);
 
 		Inflater inflater = new Inflater(true);
 		inflater.setInput(decodeBytes);
-		byte[] xmlMessageBytes = new byte[5000];
-		int resultLength = inflater.inflate(xmlMessageBytes);
-
-		if (!inflater.finished()) {
-			throw new RuntimeException("didn't allocate enough space to hold "
-					+ "decompressed data");
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decodeBytes.length);
+		byte[] buffer = new byte[1024];
+		while(!inflater.finished()) {
+			int count = inflater.inflate(buffer);
+			outputStream.write(buffer, 0, count);
 		}
+		outputStream.close();
+		byte[] inflatedMessage = outputStream.toByteArray();
 
-		inflater.end();
-
-		String decodedResponse = new String(xmlMessageBytes, 0, resultLength,
+		String decodedResponse = new String(inflatedMessage, 0, inflatedMessage.length,
 				"UTF-8");
 
 		String entityID = this
 				.recuperarEntityID(decodedResponse, "saml:Issuer");
 
 		return entityID;
-	}*/
+	}
 
 	private String recuperarEntityID(String fonte, String tagName) {
 		String retorno = "";

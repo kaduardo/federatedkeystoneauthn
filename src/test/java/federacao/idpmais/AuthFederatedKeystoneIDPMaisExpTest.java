@@ -44,28 +44,6 @@ public class AuthFederatedKeystoneIDPMaisExpTest extends FederatedKeystoneTest{
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
 	}
-
-	@Test
-	public void testGetIdPResponse2() throws Exception {
-		
-		//String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
-		
-		System.out.println("IdP Request");
-		//System.out.println("Endpoint: " + idpRequest[0]);
-		//System.out.println("SAMLRequest: " + idpRequest[1]);
-		
-		//if (IDP_ENDPOINT == null) {
-		//	IDP_ENDPOINT = idpRequest[0];
-		//}
-		
-		String response = keystoneClient.getIdPResponse(IDP_ENDPOINT, null);
-		
-		assertNotNull(response);
-		
-		System.out.println("IdP response: \n" + response);
-		
-		fail("Not yet implemented"); // TODO
-	}
 	
 	@Test
 	public void testGetUnscopedToken() throws Exception {
