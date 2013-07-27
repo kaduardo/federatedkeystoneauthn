@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 public abstract class FederatedKeystoneTest {
@@ -19,25 +20,44 @@ public abstract class FederatedKeystoneTest {
 	protected String IDP_ENDPOINT = null;
 	protected String TENANT_ID = null;
 
+	protected String selectedRealm = null;
+	
+	@Before
+	public void setUp() throws Exception {
+		this.selectedRealm = null;
+	}
+	
 	@Test
 	public void testGetRealmList() throws Exception {
 		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);
 		
 		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
 		
+		processRealm(realms);
+	}
+
+	public void processRealm(List<String> realms) {
 		boolean found = false;
+		selectedRealm = null;
 		for (String realm : realms) {
-			if (realm.equals(REALM)) {
+			if (realm.contains(REALM)) {
 				found = true;
+				selectedRealm = realm;
 			}
 			System.out.println("Realm: " + realm);
 		}
 		assertTrue("Expected realm \"" + REALM + "\" not found.", found);
+		assertNotNull(selectedRealm);
+		
 	}
-
+	
 	@Test
 	public void testGetIdPRequest() throws Exception {
-		String[] response = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);		
+		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
+		processRealm(realms);
+		
+		String[] response = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, selectedRealm);
 		
 		assertTrue("Wrong number of elements in the return", (response.length == 2));
 		
@@ -58,7 +78,9 @@ public abstract class FederatedKeystoneTest {
 
 	@Test
 	public void testGetIdPResponse() throws Exception {
-		
+		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);		
+		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
+		processRealm(realms);
 		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
 		
 		if (IDP_ENDPOINT == null) {

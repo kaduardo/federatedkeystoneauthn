@@ -19,8 +19,8 @@ public class AuthFederatedKeystoneIDPMaisExpTest extends FederatedKeystoneTest{
 	
 	static String PILOTO_ENTITY_ID = "https://gt-cnc2.pop-pa.rnp.br:5000/";
 	
-	static String IDPMAIS_REALM = "IdP-stcfed-IFSC";
-	static String IDPMAIS_ENDPOINT = "https://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
+	static String IDPMAIS_REALM = "IdP+ STCFED";
+	static String IDPMAIS_ENDPOINT = "http://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
 	static String USERNAME1 = "funcionario";
 	static String PASSWORD1 = "funcionario123";
 	
@@ -37,7 +37,7 @@ public class AuthFederatedKeystoneIDPMaisExpTest extends FederatedKeystoneTest{
 	public void setUp() throws Exception {
 		keystoneClient = new AuthFederatedKeystoneIDPMais(PINGA_ENDPOINT);
 		this.KEYSTONE_ENDPOINT = PINGA_ENDPOINT;
-		this.REALM = IDPMAIS_EXPRESSO_REALM;
+		this.REALM = IDPMAIS_REALM;
 		this.IDP_ENDPOINT = IDPMAIS_ENDPOINT;
 		this.ENTITY_ID = PINGA_ENTITY_ID;
 		

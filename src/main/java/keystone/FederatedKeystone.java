@@ -62,14 +62,14 @@ public abstract class FederatedKeystone {
 			httpPostRequest.addHeader("Content-type", "application/json");
 			httpPostRequest.addHeader("X-Authentication-Type", "federated");
 
-			System.out.println("request: " + httpPostRequest.toString());
+			System.out.println("getRealmList() - request: " + httpPostRequest.toString());
 
 			// vai tratar a resposta da requisio
 			HttpResponse resp = httpClient.execute(httpPostRequest);
 
 			// transforma resposta em uma string contendo o json da resposta
 			String response = OurUtil.httpEntityToString(resp.getEntity());
-
+			System.out.println("getRealmList() - Response: \n" + response);
 			JSONObject jsonResp = new JSONObject(response);
 
 			// OBS.: realm=IDP
@@ -79,7 +79,7 @@ public abstract class FederatedKeystone {
 
 			for (int i = 0; i < realms.length(); ++i) {
 				JSONObject realm = realms.getJSONObject(i);
-				idps.add(realm.getString("name"));
+				idps.add(realm.toString() );
 			}
 
 			return idps;
@@ -98,8 +98,11 @@ public abstract class FederatedKeystone {
 		try {
 
 			// cria json com crenciais para requisitar autenticação
-			StringEntity entity = new StringEntity("{\"realm\": {\"name\":\""
-					+ realm + "\"}}");
+			String json = "{\"realm\":"
+					+ realm + "}";
+			System.out.println("Json to send: \n" + json);
+			
+			StringEntity entity = new StringEntity(json);
 
 			entity.setContentType("application/json");
 			httpPost.setEntity(entity);
@@ -111,7 +114,7 @@ public abstract class FederatedKeystone {
 
 			// transforma resposta em uma string contendo o json da resposta
 			String responseAsString = httpEntityToString(resp.getEntity());
-
+			System.out.println("Resposta idpRequest: \n" + responseAsString);
 			JSONObject jsonResp = new JSONObject(responseAsString);
 
 			responses[0] = jsonResp.getString("idpEndpoint");
