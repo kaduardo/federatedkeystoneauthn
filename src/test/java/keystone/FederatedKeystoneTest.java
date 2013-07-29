@@ -104,9 +104,9 @@ public abstract class FederatedKeystoneTest {
 		for (int i = 0; i < tenants.length(); i++) {
 			JSONObject tenant = tenants.getJSONObject(i);
 			assertNotNull(tenant);
-			System.out.println("FriendlyName: " + tenant.getString("friendlyName") );
-			System.out.println("Name: " + tenant.getString("name") );
-			System.out.println("id: " + tenant.getString("id") );
+			System.out.println("Project: " + tenant.getString("project") );
+			System.out.println("Name: " + tenant.getJSONObject("project").getString("name") );
+			System.out.println("id: " + tenant.getJSONObject("project").getString("id") );
 		}
 		
 		String unscopedToken = keystoneClient.getUnescopedToken();
@@ -117,21 +117,25 @@ public abstract class FederatedKeystoneTest {
 
 	@Test
 	public void testSwapTokens() throws Exception {
-		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, REALM);
+		List<String> realms = keystoneClient.getRealmList(KEYSTONE_ENDPOINT);
+		assertTrue("Empty realms returned by keystone", (realms.size() > 0));
+		processRealm(realms);
+		String[] idpRequest = keystoneClient.getIdPRequest(KEYSTONE_ENDPOINT, selectedRealm);
+
 		if (IDP_ENDPOINT == null) {
 			IDP_ENDPOINT = idpRequest[0];
 		}
 		
 		String idpResponse = keystoneClient.getIdPResponse(IDP_ENDPOINT, idpRequest[1]);
 		
-		JSONArray tenants = keystoneClient.getUnscopedToken(KEYSTONE_ENDPOINT, idpResponse, REALM);
+		JSONArray tenants = keystoneClient.getUnscopedToken(KEYSTONE_ENDPOINT, idpResponse, selectedRealm);
 		assertNotNull(tenants);
 		
 		String unscopedToken = keystoneClient.getUnescopedToken();
 		assertNotNull(unscopedToken);
 		System.out.println("Unscoped Token: " + unscopedToken);
 		
-		String scopedToken = keystoneClient.swapTokens(KEYSTONE_ENDPOINT, unscopedToken, tenants.getJSONObject(0).getString("id") );
+		String scopedToken = keystoneClient.swapTokens(KEYSTONE_ENDPOINT, unscopedToken, tenants.getJSONObject(0).getJSONObject("project").getString("id") );
 		assertNotNull(scopedToken);
 		System.out.println("Scoped Token: " + scopedToken);
 		
