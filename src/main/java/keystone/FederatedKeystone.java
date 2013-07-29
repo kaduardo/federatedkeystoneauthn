@@ -191,10 +191,13 @@ public abstract class FederatedKeystone {
 		HttpPost httpPostRequest = new HttpPost(keystoneEndpoint + "/tokens");
 
 		try {
-			StringEntity entity = new StringEntity("{\"auth\" : "
-					+ "{\"token\" : " + "{\"id\" : \"" + unscopedToken
-					+ "\"}, " + " \"tenantId\" : \"" + tenantId + "\"" + "}"
-					+ "}");
+			StringEntity entity = new StringEntity(
+				"{\"auth\" : " + 
+					"{\"token\" : " + 
+						"{\"id\" : \"" + unscopedToken + "\"}, " + 
+					     "\"tenantId\" : \"" + tenantId + "\"" + 
+					"}" +
+				"}");
 			entity.setContentType("application/json");
 			httpPostRequest.setEntity(entity);
 			httpPostRequest.addHeader("Content-type", "application/json");
