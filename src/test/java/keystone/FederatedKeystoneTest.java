@@ -36,20 +36,7 @@ public abstract class FederatedKeystoneTest {
 		processRealm(realms);
 	}
 
-	public void processRealm(List<String> realms) {
-		boolean found = false;
-		selectedRealm = null;
-		for (String realm : realms) {
-			if (realm.contains(REALM)) {
-				found = true;
-				selectedRealm = realm;
-			}
-			System.out.println("Realm: " + realm);
-		}
-		assertTrue("Expected realm \"" + REALM + "\" not found.", found);
-		assertNotNull(selectedRealm);
-		
-	}
+	public abstract void processRealm(List<String> realms);
 	
 	@Test
 	public void testGetIdPRequest() throws Exception {
@@ -148,7 +135,6 @@ public abstract class FederatedKeystoneTest {
 		assertNotNull(scopedToken);
 		System.out.println("Scoped Token: " + scopedToken);
 		
-		fail("Not yet implemented"); // TODO
 	}
 
 }

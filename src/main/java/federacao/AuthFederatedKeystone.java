@@ -3,7 +3,7 @@ package federacao;
 import java.util.ArrayList;
 import java.util.List;
 
-import keystone.FederatedKeystone;
+import keystone.FederatedKeystonePinga;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
@@ -23,7 +23,7 @@ import org.jsoup.nodes.Element;
 
 import connection.OurUtil;
 
-public class AuthFederatedKeystone extends FederatedKeystone {
+public class AuthFederatedKeystone extends FederatedKeystonePinga {
 
 	static String KEYSTONE_ENDPOINT = "http://cana.ect.ufrn.br:5000/v2.0";
 
