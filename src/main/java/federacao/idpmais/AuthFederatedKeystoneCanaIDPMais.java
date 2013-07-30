@@ -1,21 +1,13 @@
 package federacao.idpmais;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
-
-import keystone.FederatedKeystone;
+import keystone.FederatedKeystoneCana;
 import br.rnp.stcfed.sts.client.impl.IDPMaisClient;
 
-public class AuthFederatedKeystoneIDPMais extends FederatedKeystone {
+public class AuthFederatedKeystoneCanaIDPMais extends FederatedKeystoneCana {
 	
 	IDPMaisClient idpMais;
 	
-	public AuthFederatedKeystoneIDPMais(String keystoneEndpoint) {
+	public AuthFederatedKeystoneCanaIDPMais(String keystoneEndpoint) {
 		super(keystoneEndpoint);
 		
 		idpMais = new IDPMaisClient();

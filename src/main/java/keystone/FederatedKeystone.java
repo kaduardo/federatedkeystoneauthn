@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
@@ -14,6 +13,7 @@ import java.util.zip.Inflater;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -22,11 +22,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import connection.MyHttpClientTrustAll;
 import connection.OurUtil;
 
 public abstract class FederatedKeystone {
-
 	private DefaultHttpClient httpClient;
 
 	private String keystoneEndpoint;
@@ -40,15 +38,8 @@ public abstract class FederatedKeystone {
 
 	private String unescopedToken;
 	private String token;
-
-	public FederatedKeystone() {
-		this(null);
-	}
-
-	public FederatedKeystone(String keystoneEndpoint) {
-		this.httpClient = new MyHttpClientTrustAll();
-	}
-
+	
+	
 	public List<String> getRealmList(String keystoneEndpoint) throws Exception {
 
 		HttpPost httpPostRequest = new HttpPost(keystoneEndpoint);
@@ -62,14 +53,14 @@ public abstract class FederatedKeystone {
 			httpPostRequest.addHeader("Content-type", "application/json");
 			httpPostRequest.addHeader("X-Authentication-Type", "federated");
 
-			System.out.println("request: " + httpPostRequest.toString());
+			System.out.println("getRealmList() - request: " + httpPostRequest.toString());
 
 			// vai tratar a resposta da requisio
-			HttpResponse resp = httpClient.execute(httpPostRequest);
+			HttpResponse resp = getHttpClient().execute(httpPostRequest);
 
 			// transforma resposta em uma string contendo o json da resposta
 			String response = OurUtil.httpEntityToString(resp.getEntity());
-
+			System.out.println("getRealmList() - Response: \n" + response);
 			JSONObject jsonResp = new JSONObject(response);
 
 			// OBS.: realm=IDP
@@ -79,7 +70,7 @@ public abstract class FederatedKeystone {
 
 			for (int i = 0; i < realms.length(); ++i) {
 				JSONObject realm = realms.getJSONObject(i);
-				idps.add(realm.getString("name"));
+				idps.add(realm.toString() );
 			}
 
 			return idps;
@@ -88,6 +79,8 @@ public abstract class FederatedKeystone {
 		}
 	}
 
+	public abstract String buildIdpRequestJson(String realm);
+	
 	public String[] getIdPRequest(String keystoneEndpoint, String realm)
 			throws Exception {
 		String[] responses = new String[2];
@@ -97,21 +90,23 @@ public abstract class FederatedKeystone {
 
 		try {
 
-			// cria json com crenciais para requisitar autenticação
-			StringEntity entity = new StringEntity("{\"realm\": {\"name\":\""
-					+ realm + "\"}}");
+			// cria json com crenciais para requisitar autentica����o
+			String json = buildIdpRequestJson(realm);
+			System.out.println("Json to send: \n" + json);
+			
+			StringEntity entity = new StringEntity(json);
 
 			entity.setContentType("application/json");
 			httpPost.setEntity(entity);
 			httpPost.addHeader("Content-type", "application/json");
 			httpPost.addHeader("X-Authentication-Type", "federated");
 
-			// vai tratar a resposta da requisição
-			HttpResponse resp = httpClient.execute(httpPost);
+			// vai tratar a resposta da requisi����o
+			HttpResponse resp = getHttpClient().execute(httpPost);
 
 			// transforma resposta em uma string contendo o json da resposta
 			String responseAsString = httpEntityToString(resp.getEntity());
-
+			System.out.println("Resposta idpRequest: \n" + responseAsString);
 			JSONObject jsonResp = new JSONObject(responseAsString);
 
 			responses[0] = jsonResp.getString("idpEndpoint");
@@ -125,16 +120,21 @@ public abstract class FederatedKeystone {
 		}
 
 	}
-
+	
+	
 	public abstract String getIdPResponse(String idpEndpoint, String idpRequest)
 			throws Exception;
-
+	
+	
+	public abstract String buildUnscopedTokenJson(String realm, String idpResponse) throws UnsupportedEncodingException ;
+	
 	public JSONArray getUnscopedToken(String keystoneEndpoint,
 			String idpResponse, String realm) throws Exception {
-		System.out.println("sendSAMlrespToKeystone endpoint: "
+		System.out.println("getUnscopedToken - endpoint: "
 				+ keystoneEndpoint);
 		System.out
-				.println("sendSAMlrespToKeystone idpResponse: " + idpResponse);
+				.println("getUnscopedToken - idpResponse: " + idpResponse);
+		System.out.println("getUnscopedToken - realm: " + realm);
 
 		HttpPost httppost = new HttpPost(keystoneEndpoint);
 
@@ -146,19 +146,18 @@ public abstract class FederatedKeystone {
 					+ "\n <FIM DECODED>>>>>>");
 			// End Debug
 
-			StringEntity entity = new StringEntity("{\"realm\":{\"name\":\""
-					+ realm + "\"}," + "\"idpResponse\":\"SAMLResponse="
-					+ URLEncoder.encode(idpResponse, "UTF-8") + "\"}");
+			String jsonRequest = buildUnscopedTokenJson(realm, idpResponse);
+			StringEntity entity = new StringEntity(jsonRequest);
 
-			System.out.println("JSON TO SEND:   <<<<<INI>>>>>\n"
-					+ httpEntityToString(entity) + "\n<<<<<FIM>>>>>");
+			System.out.println("getUnscopedToken - JSON TO SEND:\n"
+					+ httpEntityToString(entity) );
 			entity.setContentType("application/json");
 			httppost.setEntity(entity);
 			httppost.addHeader("Content-type", "application/json");
 			httppost.addHeader("X-Authentication-Type", "federated");
 
 			// vai tratar a resposta da requisicao
-			HttpResponse requestResp = httpClient.execute(httppost);
+			HttpResponse requestResp = getHttpClient().execute(httppost);
 			System.out.println("Http post sendSAMlrespToKeystone executed ");
 
 			// transforma resposta em uma string contendo o json da resposta
@@ -180,28 +179,32 @@ public abstract class FederatedKeystone {
 		}
 
 	}
-
+	
 	public void getScopedToken(String keystoneEndpoint, String idpResponse,
 			String tenantFn) {
-
+		throw new RuntimeException("not implemented"); 
 	}
-
+	
 	public String swapTokens(String keystoneEndpoint, String unscopedToken,
 			String tenantId) throws Exception {
 
-		String result = null;
 		HttpPost httpPostRequest = new HttpPost(keystoneEndpoint + "/tokens");
 
 		try {
-			StringEntity entity = new StringEntity("{\"auth\" : "
-					+ "{\"token\" : " + "{\"id\" : \"" + unscopedToken
-					+ "\"}, " + " \"tenantId\" : \"" + tenantId + "\"" + "}"
-					+ "}");
+			StringEntity entity = new StringEntity(
+				"{\"auth\" : " + 
+					"{\"token\" : " + 
+						"{\"id\" : \"" + unscopedToken + "\"}, " + 
+					     "\"tenantId\" : \"" + tenantId + "\"" + 
+					"}" +
+				"}");
+			
+
 			entity.setContentType("application/json");
 			httpPostRequest.setEntity(entity);
 			httpPostRequest.addHeader("Content-type", "application/json");
 
-			HttpResponse keystoneResponse = httpClient.execute(httpPostRequest);
+			HttpResponse keystoneResponse = getHttpClient().execute(httpPostRequest);
 
 			String responseAsString = OurUtil
 					.httpEntityToString(keystoneResponse.getEntity());
@@ -209,13 +212,13 @@ public abstract class FederatedKeystone {
 			System.out.println("\n\nKeystone Scoped TOKEN:\n"
 					+ responseAsString);
 
-			return result;
+			return responseAsString;
 
 		} finally {
 			httpPostRequest.abort();
 		}
 	}
-
+	
 	/**
 	 * Converts a HttpEntity to String format
 	 * 
@@ -244,40 +247,40 @@ public abstract class FederatedKeystone {
 			return null;
 		}
 	}
-
+	
 	//TODO improve this method to use SAML objects
 	protected String getEntityID(String samlRequest)
 			throws UnsupportedEncodingException, DataFormatException,
-			DecoderException {
+			DecoderException, IOException {
+	
+		//TODO Confirm where this 13 comes from
+		int index = (samlRequest.startsWith("?")?13:12);
+		String saml = samlRequest.substring(index, samlRequest.length());
+		String samlDecodedURL = URLDecoder.decode(saml, "UTF-8");
 		
-		return "https://pinga.ect.ufrn.br:5000";
-	}
-	/*
-		String saml = samlRequest.substring(12, samlRequest.length());
-		String samlDecodedURL = URLDecoder.decode(saml);
 		Base64 decoder = new Base64();
 		byte[] decodeBytes = decoder.decode(samlDecodedURL);
 
 		Inflater inflater = new Inflater(true);
 		inflater.setInput(decodeBytes);
-		byte[] xmlMessageBytes = new byte[5000];
-		int resultLength = inflater.inflate(xmlMessageBytes);
-
-		if (!inflater.finished()) {
-			throw new RuntimeException("didn't allocate enough space to hold "
-					+ "decompressed data");
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(decodeBytes.length);
+		byte[] buffer = new byte[1024];
+		while(!inflater.finished()) {
+			int count = inflater.inflate(buffer);
+			outputStream.write(buffer, 0, count);
 		}
+		outputStream.close();
+		byte[] inflatedMessage = outputStream.toByteArray();
 
-		inflater.end();
-
-		String decodedResponse = new String(xmlMessageBytes, 0, resultLength,
+		String decodedResponse = new String(inflatedMessage, 0, inflatedMessage.length,
 				"UTF-8");
 
 		String entityID = this
 				.recuperarEntityID(decodedResponse, "saml:Issuer");
 
 		return entityID;
-	}*/
+	}
 
 	private String recuperarEntityID(String fonte, String tagName) {
 		String retorno = "";
@@ -289,6 +292,8 @@ public abstract class FederatedKeystone {
 		}
 		return retorno;
 	}
+	
+	
 	
 	public DefaultHttpClient getHttpClient() {
 		return httpClient;
@@ -361,5 +366,4 @@ public abstract class FederatedKeystone {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 }

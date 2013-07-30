@@ -4,7 +4,7 @@ import keystone.FederatedKeystoneTest;
 
 import org.junit.Before;
 
-public class AuthFederatedKeystoneTest extends FederatedKeystoneTest {
+public abstract class AuthFederatedKeystoneTest extends FederatedKeystoneTest {
 
 	static String CANA_ENDPOINT = "http://cana.ect.ufrn.br:5000/v2.0";
 	
