@@ -14,7 +14,8 @@ public class AuthFederatedKeystonePingaIDPMaisTest extends FederatedKeystoneTest
 	static String PINGA_ENDPOINT = "https://pinga.ect.ufrn.br:5000/v2.0";
 	static String PINGA_ENTITY_ID = "https://pinga.ect.ufrn.br:5000";
 	
-	static String PILOTO_ENTITY_ID = "https://gt-cnc2.pop-pa.rnp.br:5000/";
+	static String PILOTO_ENDPOINT = "https://gt-cnc2.pop-pa.rnp.br:5000/v2.0";
+	static String PILOTO_ENTITY_ID = "https://gt-cnc2.pop-pa.rnp.br:5000";
 	
 	static String IDPMAIS_REALM = "IdP+ STCFED";
 	static String IDPMAIS_ENDPOINT = "http://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
@@ -32,11 +33,12 @@ public class AuthFederatedKeystonePingaIDPMaisTest extends FederatedKeystoneTest
 	
 	@Before
 	public void setUp() throws Exception {
-		keystoneClient = new AuthFederatedKeystonePingaIDPMais(PINGA_ENDPOINT);
-		this.KEYSTONE_ENDPOINT = PINGA_ENDPOINT;
+		keystoneClient = new AuthFederatedKeystonePingaIDPMais(PILOTO_ENDPOINT);
+		this.KEYSTONE_ENDPOINT = PILOTO_ENDPOINT;
+		this.ENTITY_ID = PILOTO_ENTITY_ID;
+		
 		this.REALM = IDPMAIS_REALM;
 		this.IDP_ENDPOINT = IDPMAIS_ENDPOINT;
-		this.ENTITY_ID = PINGA_ENTITY_ID;
 		
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
