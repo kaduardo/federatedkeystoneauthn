@@ -14,8 +14,7 @@ public class AuthFederatedKeystonePingaIDPMaisExpressoTest extends FederatedKeys
 	static String PINGA_ENDPOINT = "https://pinga.ect.ufrn.br:5000/v2.0";
 	static String PINGA_ENTITY_ID = "https://pinga.ect.ufrn.br:5000";
 	
-	
-	static String IDPMAIS_EXPRESSO_REALM = "IdP IDP1.cafeexpresso"; 
+	static String IDPMAIS_EXPRESSO_REALM = "IdP+ CAFeExpresso"; 
 	static String IDPMAIS_EXPRESSO_ENDPOINT = "https://idp-mais.cafeexpresso.rnp.br/RNPSecurityTokenService/RNPSTS";
 
 	static String USERNAME1 = "funcionario";
