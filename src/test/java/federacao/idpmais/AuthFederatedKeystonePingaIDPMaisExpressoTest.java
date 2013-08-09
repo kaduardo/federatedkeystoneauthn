@@ -9,22 +9,21 @@ import keystone.FederatedKeystoneTest;
 
 import org.junit.Before;
 
-public class AuthFederatedKeystonePingaIDPMaisTest extends FederatedKeystoneTest{
+public class AuthFederatedKeystonePingaIDPMaisExpressoTest extends FederatedKeystoneTest{
 
 	static String PINGA_ENDPOINT = "https://pinga.ect.ufrn.br:5000/v2.0";
 	static String PINGA_ENTITY_ID = "https://pinga.ect.ufrn.br:5000";
 	
-	static String IDPMAIS_REALM = "IdP+ STCFED";
-	static String IDPMAIS_ENDPOINT = "http://idpstcfed.sj.ifsc.edu.br/RNPSecurityTokenService/RNPSTS";
+	static String IDPMAIS_EXPRESSO_REALM = "IdP+ CAFeExpresso"; 
+	static String IDPMAIS_EXPRESSO_ENDPOINT = "https://idp-mais.cafeexpresso.rnp.br/RNPSecurityTokenService/RNPSTS";
+
 	static String USERNAME1 = "funcionario";
 	static String PASSWORD1 = "funcionario123";
-	
-	static String IDPMAIS_EXPRESSO_REALM = "IdP IDP1.cafeexpresso"; 
-	static String IDPMAIS_EXPRESSO_ENDPOINT = "https://idp-mais.cafeexpresso.rnp.br/RNPSecurityTokenService/RNPSTS";
-	static String USERNAME_EXPRESSO = "joaogt";
-	static String PASSWORD_EXPRESSO = "joao123";
-	
 
+	static String USERNAME2 = "joaogt";
+	static String PASSWORD2 = "joao123";
+
+	//TODO confirmar o id e retestar
 	static String TENANTID = "312e06f400834de395ce41e7ac28e0cc";
 	
 	
@@ -34,8 +33,8 @@ public class AuthFederatedKeystonePingaIDPMaisTest extends FederatedKeystoneTest
 		this.KEYSTONE_ENDPOINT = PINGA_ENDPOINT;
 		this.ENTITY_ID = PINGA_ENTITY_ID;
 		
-		this.REALM = IDPMAIS_REALM;
-		this.IDP_ENDPOINT = IDPMAIS_ENDPOINT;
+		this.REALM = IDPMAIS_EXPRESSO_REALM;
+		this.IDP_ENDPOINT = IDPMAIS_EXPRESSO_ENDPOINT;
 		
 		keystoneClient.setUsername(USERNAME1);
 		keystoneClient.setPassword(PASSWORD1);
